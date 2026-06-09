@@ -1,4 +1,6 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { AutoExportSelectedJson } from "./components/AutoExportSelectedJson";
 import { PropertyPanel } from "./components/PropertyPanel";
 import { SearchBar } from "./components/SearchBar";
 import { StoreyFilter } from "./components/StoreyFilter";
@@ -6,20 +8,28 @@ import { UploadZone } from "./components/UploadZone";
 import { Viewer } from "./components/Viewer";
 import { useElementPicker } from "./hooks/useElementPicker";
 import { useIFCLoader } from "./hooks/useIFCLoader";
+import {
+  elementIndexState,
+  filterOptionsState,
+  filtersState,
+  searchResultsSelector,
+  searchTermState,
+  selectedElementState,
+  selectedFileState,
+} from "./state/ifcState";
 
 function App() {
-  const [selectedFile, setSelectedFile] = useState(null);
   const [viewerApi, setViewerApi] = useState(null);
   const [viewerElement, setViewerElement] = useState(null);
   const [model, setModel] = useState(null);
-  const [selectedElement, setSelectedElement] = useState(null);
-  const [elementIndex, setElementIndex] = useState([]);
-  const [filterOptions, setFilterOptions] = useState({
-    storeyNames: [],
-    typeNames: [],
-  });
-  const [filters, setFilters] = useState({ storeys: [], types: [] });
-  const [searchTerm, setSearchTerm] = useState("");
+  const selectedFile = useRecoilValue(selectedFileState);
+  const selectedElement = useRecoilValue(selectedElementState);
+  const searchResults = useRecoilValue(searchResultsSelector);
+  const setSelectedElement = useSetRecoilState(selectedElementState);
+  const setElementIndex = useSetRecoilState(elementIndexState);
+  const setFilterOptions = useSetRecoilState(filterOptionsState);
+  const setFilters = useSetRecoilState(filtersState);
+  const setSearchTerm = useSetRecoilState(searchTermState);
 
   const handleViewerReady = useCallback((nextViewerApi, nextViewerElement) => {
     setViewerApi(nextViewerApi);
@@ -37,8 +47,15 @@ function App() {
       setFilterOptions(nextFilterOptions);
       setSelectedElement(null);
       setFilters({ storeys: [], types: [] });
+      setSearchTerm("");
     },
-    [],
+    [
+      setElementIndex,
+      setFilterOptions,
+      setFilters,
+      setSearchTerm,
+      setSelectedElement,
+    ],
   );
 
   const loadState = useIFCLoader({
@@ -54,45 +71,19 @@ function App() {
     onElementSelected: setSelectedElement,
   });
 
-  const searchResults = useMemo(() => {
-    const normalizedSearchTerm = searchTerm.trim().toLowerCase();
-    if (!normalizedSearchTerm) return [];
-    return elementIndex.filter((row) =>
-      row.searchText.includes(normalizedSearchTerm),
-    );
-  }, [elementIndex, searchTerm]);
-
-  function toggleFilter(groupName, value) {
-    setFilters((currentFilters) => {
-      const selectedValues = currentFilters[groupName];
-      const nextValues = selectedValues.includes(value)
-        ? selectedValues.filter((item) => item !== value)
-        : [...selectedValues, value];
-
-      return { ...currentFilters, [groupName]: nextValues };
-    });
-  }
-
   return (
     <main className="app-shell">
       <aside className="left-panel">
         <div className="brand-block">
-          <p className="eyebrow">React state example</p>
+          {/* <p className="eyebrow">React state example</p> */}
           <h1>IFC Element Inspector</h1>
         </div>
-        <UploadZone file={selectedFile} onFileSelected={setSelectedFile} />
-        <SearchBar
-          searchTerm={searchTerm}
-          matchCount={searchResults.length}
-          onSearchTermChange={setSearchTerm}
-        />
-        <StoreyFilter
-          filters={filters}
-          filterOptions={filterOptions}
-          onToggleFilter={toggleFilter}
-          onResetFilters={() => setFilters({ storeys: [], types: [] })}
-        />
+        <UploadZone />
+        <SearchBar />
+        <StoreyFilter />
       </aside>
+
+      <AutoExportSelectedJson selectionState={selectedElementState} />
 
       <Viewer
         file={selectedFile}
@@ -102,11 +93,7 @@ function App() {
         onViewerReady={handleViewerReady}
       />
 
-      <PropertyPanel
-        selectedElement={selectedElement}
-        pickError={pickError}
-        loadError={loadState.error}
-      />
+      <PropertyPanel pickError={pickError} loadError={loadState.error} />
     </main>
   );
 }

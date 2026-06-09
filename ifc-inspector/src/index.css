@@ -369,86 +369,47 @@ h3 {
   width: 100%;
 }
 
-.property-groups {
-  display: grid;
-  gap: 10px;
-  min-height: 0;
-  overflow: auto;
-  padding-right: 4px;
-}
-
-.property-group {
+.property-table {
   border: 1px solid #e4ebf2;
   border-radius: 6px;
-  overflow: hidden;
+  min-height: 0;
+  overflow: auto;
 }
 
-.property-group summary {
-  align-items: center;
-  background: #f7fafc;
-  color: #24313f;
-  cursor: pointer;
-  display: flex;
-  font-size: 0.86rem;
-  font-weight: 800;
-  gap: 10px;
-  justify-content: space-between;
-  list-style: none;
-  min-height: 36px;
-  padding: 0 10px;
-}
-
-.property-group summary::-webkit-details-marker {
-  display: none;
-}
-
-.property-group summary::before {
-  color: #607080;
-  content: "+";
-  font-weight: 900;
-}
-
-.property-group[open] summary::before {
-  content: "-";
-}
-
-.property-group summary span {
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.property-group summary small {
-  color: #627386;
-  font-size: 0.72rem;
-}
-
-.property-table {
-  display: grid;
-}
-
-.property-row {
-  align-items: start;
-  border-top: 1px solid #eef3f7;
-  display: grid;
-  gap: 8px;
-  grid-template-columns: minmax(92px, 0.9fr) minmax(0, 1.1fr);
-  padding: 8px 10px;
-}
-
-.property-row span {
-  color: #627386;
-  font-size: 0.75rem;
+.property-table .MuiTableCell-root {
+  border-bottom-color: #eef3f7;
+  font-family: inherit;
   line-height: 1.35;
   overflow-wrap: anywhere;
+  padding: 7px 10px;
+  vertical-align: top;
 }
 
-.property-row strong {
+.property-table .MuiTableHead-root .MuiTableCell-root {
+  background: #fbfdff;
+  color: #627386;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.property-table__set.MuiTableCell-root {
+  color: #24313f;
+  font-size: 0.75rem;
+  font-weight: 800;
+  width: 28%;
+}
+
+.property-table__label.MuiTableCell-root {
+  color: #627386;
+  font-size: 0.75rem;
+  width: 30%;
+}
+
+.property-table__value.MuiTableCell-root {
   color: #17202a;
   font-size: 0.78rem;
-  line-height: 1.4;
-  overflow-wrap: anywhere;
+  font-weight: 700;
 }
 
 @media (max-width: 1100px) {

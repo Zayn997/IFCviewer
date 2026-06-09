@@ -1,8 +1,11 @@
+import { useRecoilValue } from "recoil";
 import { exportElementAsCSV, exportElementAsJSON } from "../utils/exportUtils";
 import { getElementSummary } from "../utils/ifcUtils";
+import { selectedElementState } from "../state/ifcState";
 import { PropertyList } from "./PropertyList";
 
-export function PropertyPanel({ selectedElement, pickError, loadError }) {
+export function PropertyPanel({ pickError, loadError }) {
+  const selectedElement = useRecoilValue(selectedElementState);
   const summary = getElementSummary(selectedElement?.properties);
   const propertyRows = selectedElement?.flattenedProperties ?? [];
 

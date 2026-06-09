@@ -1,12 +1,15 @@
 import { useRef, useState } from "react";
+import { useRecoilState } from "recoil";
+import { selectedFileState } from "../state/ifcState";
 
-export function UploadZone({ file, onFileSelected }) {
+export function UploadZone() {
   const inputRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [file, setFile] = useRecoilState(selectedFileState);
 
   function acceptFile(nextFile) {
     if (!nextFile || !nextFile.name.toLowerCase().endsWith(".ifc")) return;
-    onFileSelected(nextFile);
+    setFile(nextFile);
   }
 
   return (

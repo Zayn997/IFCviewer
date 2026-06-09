@@ -1,4 +1,10 @@
-export function SearchBar({ searchTerm, matchCount, onSearchTermChange }) {
+import { useRecoilState, useRecoilValue } from "recoil";
+import { searchResultsSelector, searchTermState } from "../state/ifcState";
+
+export function SearchBar() {
+  const [searchTerm, setSearchTerm] = useRecoilState(searchTermState);
+  const searchResults = useRecoilValue(searchResultsSelector);
+
   return (
     <label className="search-bar">
       <span>Search properties</span>
@@ -6,10 +12,12 @@ export function SearchBar({ searchTerm, matchCount, onSearchTermChange }) {
         type="search"
         value={searchTerm}
         placeholder="Fire rating, facade, IfcWall"
-        onChange={(event) => onSearchTermChange(event.target.value)}
+        onChange={(event) => setSearchTerm(event.target.value)}
       />
       <small>
-        {searchTerm ? `${matchCount} matches` : "Search the loaded model index"}
+        {searchTerm
+          ? `${searchResults.length} matches`
+          : "Search the loaded model index"}
       </small>
     </label>
   );

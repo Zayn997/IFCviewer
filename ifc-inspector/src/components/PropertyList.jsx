@@ -1,4 +1,12 @@
 import { useMemo, useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from "@mui/material";
 import { toDisplayText } from "../utils/ifcUtils";
 
 const IMPORTANT_KEYS = [
@@ -44,8 +52,6 @@ export function PropertyList({ rows }) {
     return importantRows.length > 0 ? importantRows : filteredRows.slice(0, 24);
   }, [propertySearch, rows, showAll]);
 
-  const groupedRows = useMemo(() => groupRows(visibleRows), [visibleRows]);
-
   if (rows.length === 0) {
     return (
       <section className="property-browser property-browser--empty">
@@ -81,49 +87,37 @@ export function PropertyList({ rows }) {
         onChange={(event) => setPropertySearch(event.target.value)}
       />
 
-      <div className="property-groups">
-        {groupedRows.map((group, index) => (
-          <details
-            key={group.name}
-            className="property-group"
-            open={index < 2 || propertySearch !== ""}
-          >
-            <summary>
-              <span>{formatPropertyLabel(group.name)}</span>
-              <small>{group.rows.length}</small>
-            </summary>
-            <div className="property-table">
-              {group.rows.map((row) => (
-                <div
-                  key={`${row.key}-${row.displayValue}`}
-                  className="property-row"
+      <TableContainer className="property-table" component="div">
+        <Table stickyHeader aria-label="Property sets" size="small">
+          <TableHead>
+            <TableRow>
+              <TableCell>Property set</TableCell>
+              <TableCell>Property</TableCell>
+              <TableCell>Value</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {visibleRows.map((row, index) => (
+              <TableRow key={`${row.key}-${row.displayValue}-${index}`}>
+                <TableCell className="property-table__set" title={row.group}>
+                  {formatPropertyLabel(row.group)}
+                </TableCell>
+                <TableCell className="property-table__label" title={row.key}>
+                  {row.label}
+                </TableCell>
+                <TableCell
+                  className="property-table__value"
+                  title={row.displayValue}
                 >
-                  <span title={row.key}>{row.label}</span>
-                  <strong title={row.displayValue}>{row.displayValue}</strong>
-                </div>
-              ))}
-            </div>
-          </details>
-        ))}
-      </div>
+                  {row.displayValue}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </section>
   );
-}
-
-function groupRows(rows) {
-  const groups = new Map();
-
-  rows.forEach((row) => {
-    const groupName = row.group;
-    const groupRows = groups.get(groupName) ?? [];
-    groupRows.push(row);
-    groups.set(groupName, groupRows);
-  });
-
-  return [...groups.entries()].map(([name, groupRows]) => ({
-    name,
-    rows: groupRows,
-  }));
 }
 
 function getPropertyGroup(key) {

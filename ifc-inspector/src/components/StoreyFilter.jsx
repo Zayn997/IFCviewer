@@ -1,9 +1,21 @@
-export function StoreyFilter({
-  filters,
-  filterOptions,
-  onToggleFilter,
-  onResetFilters,
-}) {
+import { useRecoilState, useRecoilValue } from "recoil";
+import { filterOptionsState, filtersState } from "../state/ifcState";
+
+export function StoreyFilter() {
+  const [filters, setFilters] = useRecoilState(filtersState);
+  const filterOptions = useRecoilValue(filterOptionsState);
+
+  function toggleFilter(groupName, value) {
+    setFilters((currentFilters) => {
+      const selectedValues = currentFilters[groupName];
+      const nextValues = selectedValues.includes(value)
+        ? selectedValues.filter((item) => item !== value)
+        : [...selectedValues, value];
+
+      return { ...currentFilters, [groupName]: nextValues };
+    });
+  }
+
   return (
     <div className="filter-stack">
       <FilterGroup
@@ -11,19 +23,19 @@ export function StoreyFilter({
         emptyText="Storeys appear after loading a model"
         options={filterOptions.storeyNames}
         selected={filters.storeys}
-        onToggle={(value) => onToggleFilter("storeys", value)}
+        onToggle={(value) => toggleFilter("storeys", value)}
       />
       <FilterGroup
         title="Element types"
         emptyText="Types appear after loading a model"
         options={filterOptions.typeNames}
         selected={filters.types}
-        onToggle={(value) => onToggleFilter("types", value)}
+        onToggle={(value) => toggleFilter("types", value)}
       />
       <button
         className="secondary-button"
         type="button"
-        onClick={onResetFilters}
+        onClick={() => setFilters({ storeys: [], types: [] })}
       >
         Reset filters
       </button>
